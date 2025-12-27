@@ -1,0 +1,43 @@
+/* Enhanced ReactFlow edge styling */
+.react-flow__edge-path {
+  stroke-width: 2.5;
+  stroke: #64748b;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #475569;
+  stroke-width: 3;
+}
+
+/* Enhanced handle styling */
+.react-flow__handle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+/* Smooth node transitions - disabled during dragging for performance */
+.react-flow__node:not(.react-flow__node-dragging) {
+  transition: box-shadow 0.2s ease;
+}
+
+.react-flow__node.selected {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* Enhanced controls styling */
+.react-flow__controls-button {
+  background: white;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.react-flow__controls-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
