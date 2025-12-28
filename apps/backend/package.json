@@ -13,6 +13,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.97",
+    "bcrypt": "^6.0.0",
     "common": "*",
     "db": "*",
     "dotenv": "^17.2.3",
