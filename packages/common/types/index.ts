@@ -11,6 +11,7 @@ export const SigninSchema = z.object({
 })
 
 export const CreateWorkflowSchema = z.object({
+    title: z.string(),
     nodes: z.array(z.object({
         nodeId: z.string(),
         data: z.object({
@@ -33,6 +34,7 @@ export const CreateWorkflowSchema = z.object({
 })
 
 export const UpdateWorkflowSchema = z.object({
+    title: z.string().optional(),
     nodes: z.array(z.object({
         nodeId: z.string(),
         data: z.object({

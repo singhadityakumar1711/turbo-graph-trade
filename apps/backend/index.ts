@@ -16,6 +16,17 @@ await mongoose.connect(uri)
 console.log("✅ Connected to MongoDB Atlas");
 app.use(express.json());
 
+// CORS middleware
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.post("/signup", async (req, res)=>{
     const {success, data} = SignupSchema.safeParse(req.body);
     if (!success){
@@ -66,7 +77,6 @@ app.post("/signin", async (req,res)=>{
                     id: user._id
                 }, JWT_SECRET)
                 return res.status(200).json({
-                    // id: user._id,
                     token: token
                 })
             }
@@ -101,6 +111,7 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
     try{    
         const workflow = await WorkflowModel.create({
             userId,
+            title: data.title,
             nodes: data.nodes,
             edges: data.edges
         })
@@ -125,10 +136,18 @@ app.put("/workflow/:workflowId", authMiddleware, async (req, res)=>{
         })
     }
     try{
-        const workflow = await WorkflowModel.findByIdAndUpdate(req.params.workflowId, data, {new:true});
-        if(!workflow){
+        const updateData: any = {
+            nodes: data.nodes,
+            edges: data.edges
+        };
+        // Include title if provided
+        if (data.title !== undefined) {
+            updateData.title = data.title;
+        }
+        const workflow = await WorkflowModel.findByIdAndUpdate(req.params.workflowId, updateData, {new:true});
+        if(!workflow || workflow.userId.toString() !== req.userId){
             return res.status(400).json({
-                messafe: "Workflow not found"
+                message: "Workflow not found"
             })
         }
         return res.status(200).json({

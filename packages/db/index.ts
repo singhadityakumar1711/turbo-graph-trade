@@ -72,6 +72,10 @@ const WorkflowSchema = new Schema({
         required:true,
         ref: 'Users'
     },
+    title: {
+        type:String,
+        required:true
+    },
     nodes: [WorkflowNodesSchema],
     edges:[EdgesSchema]
 });
@@ -128,4 +132,4 @@ const ExecutionsSchema = new Schema({
 export const UserModel = mongoose.model("Users", UserSchema);
 export const WorkflowModel = mongoose.model("Workflows", WorkflowSchema);
 export const NodesModel = mongoose.model("Nodes", NodesSchema);
-export const ExecutionsModel = mongoose.model("Execuutions", ExecutionsSchema);
+export const ExecutionsModel = mongoose.model("Executions", ExecutionsSchema);
