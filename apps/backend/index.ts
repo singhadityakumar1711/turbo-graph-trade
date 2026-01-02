@@ -102,12 +102,15 @@ app.post("/signin", async (req,res)=>{
 
 app.post("/workflow", authMiddleware, async (req, res)=>{
     const userId = req.userId!;
-    const {success, data} = CreateWorkflowSchema.safeParse(req.body);
-    if(!success){
+    const result = CreateWorkflowSchema.safeParse(req.body);
+    if(!result.success){
+        console.error("Validation error:", JSON.stringify(result.error.issues, null, 2));
         return res.status(400).json({
-            message: "Incorrect Inputs"
+            message: "Incorrect Inputs",
+            errors: result.error.issues
         })
     }
+    const data = result.data;
     try{    
         const workflow = await WorkflowModel.create({
             userId,

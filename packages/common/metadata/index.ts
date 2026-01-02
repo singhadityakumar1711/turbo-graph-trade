@@ -8,11 +8,12 @@ export type NodeKind =
 export interface NodeType {
   type: NodeKind;
   data: {
-    kind: "action" | "trigger";
+    kind: "ACTION" | "TRIGGER";
     metadata: any;
   };
   id: string;
   position: { x: number; y: number };
+  credentials: any
 }
 
 export interface Edge {

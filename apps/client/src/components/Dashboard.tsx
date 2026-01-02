@@ -61,8 +61,8 @@ export default function Dashboard() {
   };
 
   const handleOpenWorkflow = (workflowId: string) => {
-    // Navigate to create-workflow page with workflow ID
-    navigate(`/create-workflow?workflowId=${workflowId}`);
+    // Navigate to platform-workflow page with workflow ID
+    navigate(`/platform-workflow?workflowId=${workflowId}`);
   };
 
   const handleRunWorkflow = async (workflowId: string) => {
@@ -112,7 +112,7 @@ export default function Dashboard() {
               Executions
             </Button>
             <Button
-              onClick={() => navigate("/create-workflow")}
+              onClick={() => navigate("/platform-workflow/create")}
               className="bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white"
             >
               New Workflow
@@ -144,7 +144,7 @@ export default function Dashboard() {
                 No workflows yet. Create your first workflow to get started!
               </p>
               <Button
-                onClick={() => navigate("/create-workflow")}
+                onClick={() => navigate("/platform-workflow/create")}
                 className="bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white"
               >
                 Create Workflow
