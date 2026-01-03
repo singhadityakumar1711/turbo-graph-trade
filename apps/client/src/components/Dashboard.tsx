@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { User } from "lucide-react";
+import type { NodeType, Edge } from "common/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 interface Workflow {
   _id: string;
-  nodes: any[];
-  edges: any[];
   userId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  title: string;
+  nodes: NodeType[];
+  edges: Edge[];
 }
 
 export default function Dashboard() {
@@ -50,7 +50,7 @@ export default function Dashboard() {
       }
 
       const data = await response.json();
-      //   console.log(data);
+      console.log(data);
       setWorkflows(data);
     } catch (err) {
       setError("Failed to load workflows");
@@ -61,8 +61,8 @@ export default function Dashboard() {
   };
 
   const handleOpenWorkflow = (workflowId: string) => {
-    // Navigate to platform-workflow page with workflow ID
-    navigate(`/platform-workflow?workflowId=${workflowId}`);
+    // Navigate using the ID as a path segment
+    navigate(`/platform-workflow/${workflowId}`);
   };
 
   const handleRunWorkflow = async (workflowId: string) => {
@@ -161,7 +161,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-lg font-semibold text-foreground">
-                      {index + 1}. Workflow {index + 1}
+                      {index + 1}. {workflow.title}
                     </span>
                   </div>
                   <div className="flex gap-2">

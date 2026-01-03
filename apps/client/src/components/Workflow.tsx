@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 import {
   ReactFlow,
@@ -12,7 +13,7 @@ import {
   useReactFlow,
   ReactFlowProvider,
 } from "@xyflow/react";
-import type { OnConnectEnd } from "@xyflow/react";
+import type { OnConnectEnd, NodeMouseHandler } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { TriggerSheet } from "./TriggerSheet";
 import { PriceTrigger } from "@/assets/nodes/triggers/PriceTrigger";
@@ -47,6 +48,9 @@ const proOptions = { hideAttribution: true };
 function Flow() {
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [selectedTriggerNode, setSelectedTriggerNode] = useState(false);
+  const [selectedActionNode, setSelectedActionNode] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState("");
   const [actionSheetData, setActionSheetData] = useState<{
     x: number;
     y: number;
@@ -54,11 +58,15 @@ function Flow() {
     // sourceHandleId: string | null;
   } | null>(null);
   const [workflowTitle, setWorkflowTitle] = useState("Untitled");
+  const [prevWorkflowTitle, setPrevWorkflowTitle] = useState("");
   const [showTriggerPane, setShowTriggerPane] = useState(false);
+  const [showActionPane, setShowActionPane] = useState(false);
   //   const [showTitleDialog, setShowTitleDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   const { workflowId } = useParams();
   const isEditMode = Boolean(workflowId && String(workflowId) !== "create");
+  const [workflowExists, setWorkflowExists] = useState(false);
+  const navigate = useNavigate();
   //   console.log(workflowId + " - " + isEditMode);
 
   useEffect(() => {
@@ -81,6 +89,8 @@ function Flow() {
           setNodes(data.nodes);
           setEdges(data.edges);
           setWorkflowTitle(data.title);
+          setWorkflowExists(true);
+          setPrevWorkflowTitle(data.title);
         } catch (error) {
           console.error("Failed to load workflow", error);
           // Optional: navigate back to dashboard on error
@@ -125,6 +135,19 @@ function Flow() {
     },
     [screenToFlowPosition]
   );
+
+  const onNodeDoubleClick: NodeMouseHandler = useCallback((event, node) => {
+    console.log(event);
+    console.log("-----------");
+    console.log(node);
+    if (node.type == "price-trigger" || node.type == "time-trigger") {
+      setSelectedTriggerNode(true);
+      setSelectedNodeId(node.id);
+    } else {
+      setSelectedActionNode(true);
+      setSelectedNodeId(node.id);
+    }
+  }, []);
 
   // adding the new node and connecting the edge
   const onActionSelected = (type: NodeKind, metadata: any) => {
@@ -192,31 +215,64 @@ function Flow() {
             edges: cleanedEdges,
           })
         );
-        const response = await fetch(`${API_BASE_URL}/workflow`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: String(localStorage.getItem("token")),
-          },
-          body: JSON.stringify({
-            title: workflowTitle,
-            nodes: cleanedNodes,
-            edges: cleanedEdges,
-          }),
-        });
+        if (workflowExists) {
+          const response = await fetch(
+            `${API_BASE_URL}/workflow/${workflowId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                authorization: String(localStorage.getItem("token")),
+              },
+              body: JSON.stringify({
+                prevTitle: prevWorkflowTitle,
+                newTitle: workflowTitle,
+                nodes: cleanedNodes,
+                edges: cleanedEdges,
+              }),
+            }
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Failed to update workflow:", errorData);
+            const errorMessage = errorData.errors
+              ? `Validation errors: ${JSON.stringify(errorData.errors, null, 2)}`
+              : errorData.message || "Unknown error";
+            alert(`Failed to publish workflow: ${errorMessage}`);
+            return;
+          }
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Failed to publish workflow:", errorData);
-          const errorMessage = errorData.errors
-            ? `Validation errors: ${JSON.stringify(errorData.errors, null, 2)}`
-            : errorData.message || "Unknown error";
-          alert(`Failed to publish workflow: ${errorMessage}`);
-          return;
+          const data = await response.json();
+          console.log(data);
+          navigate("/platform-dashboard");
+        } else {
+          const response = await fetch(`${API_BASE_URL}/workflow`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: String(localStorage.getItem("token")),
+            },
+            body: JSON.stringify({
+              title: workflowTitle,
+              nodes: cleanedNodes,
+              edges: cleanedEdges,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Failed to publish workflow:", errorData);
+            const errorMessage = errorData.errors
+              ? `Validation errors: ${JSON.stringify(errorData.errors, null, 2)}`
+              : errorData.message || "Unknown error";
+            alert(`Failed to publish workflow: ${errorMessage}`);
+            return;
+          }
+
+          const data = await response.json();
+          console.log(data);
+          navigate("/platform-dashboard");
         }
-
-        const data = await response.json();
-        console.log(data._id);
       } catch (error) {
         console.error("Failed to publish workflow", error);
         alert("Failed to publish workflow. Please try again.");
@@ -261,7 +317,7 @@ function Flow() {
             </Button>
           </div>
         )}
-        {showTriggerPane && (
+        {showTriggerPane == true && (
           <TriggerSheet
             onSelection={(type, metadata) => {
               //passing propas to the trigger sheet
@@ -283,7 +339,74 @@ function Flow() {
             }}
           />
         )}
+        {selectedTriggerNode && (
+          <TriggerSheet
+            onSelection={(type, metadata) => {
+              let newNodeId = Math.random().toString();
+              setNodes((prevNodes) =>
+                prevNodes.map((nds) =>
+                  nds.id === selectedNodeId
+                    ? {
+                        ...nds,
+                        type,
+                        data: {
+                          kind: "TRIGGER",
+                          metadata,
+                        },
+                        id: newNodeId,
+                        position: { x: nds.position.x, y: nds.position.y },
+                        credentials: "",
+                      }
+                    : nds
+                )
+              );
+              setEdges((prevEdges) =>
+                prevEdges.map((edg) => ({ ...edg, source: newNodeId }))
+              );
+              setSelectedTriggerNode(false);
+              setShowTriggerPane(false);
+            }}
+          />
+        )}
         {actionSheetData && <ActionSheet onSelection={onActionSelected} />}
+        {selectedActionNode && (
+          <ActionSheet
+            onSelection={(type, metadata) => {
+              let newNodeId = Math.random().toString();
+              setNodes((prevNodes) =>
+                prevNodes.map((nds) =>
+                  nds.id === selectedNodeId
+                    ? {
+                        ...nds,
+                        type,
+                        data: {
+                          kind: "TRIGGER",
+                          metadata,
+                        },
+                        id: newNodeId,
+                        position: { x: nds.position.x, y: nds.position.y },
+                        credentials: "",
+                      }
+                    : nds
+                )
+              );
+              setEdges((prevEdges) =>
+                prevEdges.map((edg) =>
+                  edg.target === selectedNodeId
+                    ? {
+                        ...edg,
+                        id: edg.id,
+                        source: edg.source,
+                        target: newNodeId,
+                      }
+                    : edg
+                )
+              );
+              setSelectedActionNode(false);
+              setActionSheetData(null);
+            }}
+          />
+        )}
         <ReactFlow
           // colorMode="dark"
           nodes={nodes}
@@ -293,6 +416,7 @@ function Flow() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onConnectEnd={onConnectEnd}
+          onNodeDoubleClick={onNodeDoubleClick}
           proOptions={proOptions}
           fitView
           className="bg-transparent"

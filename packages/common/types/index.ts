@@ -34,9 +34,10 @@ export const CreateWorkflowSchema = z.object({
 })
 
 export const UpdateWorkflowSchema = z.object({
-    title: z.string().optional(),
+    prevTitle: z.string(),
+    newTitle: z.string(),
     nodes: z.array(z.object({
-        nodeId: z.string(),
+        type: z.string(),
         data: z.object({
             kind: z.enum(['ACTION', 'TRIGGER']),
             metadata:z.any()

@@ -40,6 +40,7 @@ app.post("/signup", async (req, res)=>{
             username: data.username,
             password: hashedPassword
         })
+        console.log("User created successfully");
         return res.status(200).json({
             message: "User created successfully",
             id: user._id
@@ -76,6 +77,7 @@ app.post("/signin", async (req,res)=>{
                 const token = jwt.sign({
                     id: user._id
                 }, JWT_SECRET)
+                console.log("User exits. Sign in successful")
                 return res.status(200).json({
                     token: token
                 })
@@ -93,7 +95,7 @@ app.post("/signin", async (req,res)=>{
         }
     }
     catch(e){
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal Server Error",
             error: e
         })
@@ -111,6 +113,13 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
         })
     }
     const data = result.data;
+    const workflowTitle = await WorkflowModel.find({title: data.title, userId : userId});
+    console.log(workflowTitle)
+    if(workflowTitle.length>0){
+        return res.status(409).json({
+            message: "Workflow with the same title already exists for the user"
+        })
+    }
     try{    
         const workflow = await WorkflowModel.create({
             userId,
@@ -118,13 +127,15 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
             nodes: data.nodes,
             edges: data.edges
         })
+        console.log("Workflow created successfully")
         return res.status(200).json({
             message: "Workflow created successfully",
             id:workflow._id
         })
     }
     catch(e){
-         res.status(500).json({
+        console.log("Error in creating workflow")
+         return res.status(500).json({
             message: "Internal Server Error",
             error: e
         })
@@ -138,15 +149,19 @@ app.put("/workflow/:workflowId", authMiddleware, async (req, res)=>{
             message: "Incorrect Inputs"
         })
     }
+    const workflowTitle = await WorkflowModel.find({title: data.newTitle});
+    console.log(workflowTitle)
+    if(workflowTitle.length>0 && data.newTitle!=data.prevTitle){
+        return res.status(409).json({
+            message: "Workflow with the same title already exists for the user"
+        })
+    }
     try{
         const updateData: any = {
+            title: data.newTitle,
             nodes: data.nodes,
             edges: data.edges
         };
-        // Include title if provided
-        if (data.title !== undefined) {
-            updateData.title = data.title;
-        }
         const workflow = await WorkflowModel.findByIdAndUpdate(req.params.workflowId, updateData, {new:true});
         if(!workflow || workflow.userId.toString() !== req.userId){
             return res.status(400).json({
@@ -159,7 +174,7 @@ app.put("/workflow/:workflowId", authMiddleware, async (req, res)=>{
         })
     }
     catch(e){
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal Server Error",
             error: e
         })
@@ -188,12 +203,13 @@ app.get("/workflow/executions/:workflowId", authMiddleware, async (req, res)=>{
 
 app.get("/nodes", authMiddleware, async (req, res)=>{
     const nodes = await NodesModel.find();
-    res.status(200).json(nodes)
+    return res.status(200).json(nodes)
 })
 
 app.get("/workflows", authMiddleware, async(req, res)=>{
     const workflows = await WorkflowModel.find({userId: req.userId});
-    res.status(200).json(workflows)
+    // console.log(workflows)
+    return res.status(200).json(workflows)
 })
 
 // app.post("/credentials", (req, res)=>{

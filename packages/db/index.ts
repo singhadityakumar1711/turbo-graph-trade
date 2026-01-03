@@ -53,9 +53,10 @@ const NodeDataSchema = new Schema({
 
 const WorkflowNodesSchema = new Schema({
     type:{
-        type:mongoose.Types.ObjectId,
+        // type:mongoose.Types.ObjectId,
+        type:String,
         required:true,
-        ref: "Nodes"
+        // ref: "Nodes"
     },
     data: NodeDataSchema,
     id: {
@@ -74,7 +75,8 @@ const WorkflowSchema = new Schema({
     },
     title: {
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     nodes: [WorkflowNodesSchema],
     edges:[EdgesSchema]
