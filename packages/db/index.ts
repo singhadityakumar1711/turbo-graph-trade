@@ -76,8 +76,12 @@ const WorkflowSchema = new Schema({
     title: {
         type:String,
         required:true,
-        unique:true
     },
+    // workflowId:{
+    //     type:String,
+    //     required:true,
+    //     unique:true
+    // },
     nodes: [WorkflowNodesSchema],
     edges:[EdgesSchema]
 });

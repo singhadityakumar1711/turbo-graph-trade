@@ -60,7 +60,6 @@ function Flow() {
   const [workflowTitle, setWorkflowTitle] = useState("Untitled");
   const [prevWorkflowTitle, setPrevWorkflowTitle] = useState("");
   const [showTriggerPane, setShowTriggerPane] = useState(false);
-  const [showActionPane, setShowActionPane] = useState(false);
   //   const [showTitleDialog, setShowTitleDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   const { workflowId } = useParams();
@@ -137,9 +136,9 @@ function Flow() {
   );
 
   const onNodeDoubleClick: NodeMouseHandler = useCallback((event, node) => {
-    console.log(event);
-    console.log("-----------");
-    console.log(node);
+    // console.log(event);
+    // console.log("-----------");
+    // console.log(node);
     if (node.type == "price-trigger" || node.type == "time-trigger") {
       setSelectedTriggerNode(true);
       setSelectedNodeId(node.id);
@@ -206,15 +205,15 @@ function Flow() {
           target: String(edge.target),
         }));
 
-        console.log("Publishing Workflow");
-        console.log(String(localStorage.getItem("token")));
-        console.log(
-          JSON.stringify({
-            title: workflowTitle,
-            nodes: cleanedNodes,
-            edges: cleanedEdges,
-          })
-        );
+        // console.log("Publishing Workflow");
+        // console.log(String(localStorage.getItem("token")));
+        // console.log(
+        //   JSON.stringify({
+        //     title: workflowTitle,
+        //     nodes: cleanedNodes,
+        //     edges: cleanedEdges,
+        //   })
+        // );
         if (workflowExists) {
           const response = await fetch(
             `${API_BASE_URL}/workflow/${workflowId}`,
@@ -243,7 +242,7 @@ function Flow() {
           }
 
           const data = await response.json();
-          console.log(data);
+        //   console.log(data);
           navigate("/platform-dashboard");
         } else {
           const response = await fetch(`${API_BASE_URL}/workflow`, {
@@ -270,7 +269,7 @@ function Flow() {
           }
 
           const data = await response.json();
-          console.log(data);
+        //   console.log(data);
           navigate("/platform-dashboard");
         }
       } catch (error) {

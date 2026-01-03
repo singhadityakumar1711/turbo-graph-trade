@@ -114,7 +114,12 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
     }
     const data = result.data;
     const workflowTitle = await WorkflowModel.find({title: data.title, userId : userId});
-    console.log(workflowTitle)
+    // console.log("--------")
+    // console.log(workflowTitle)
+    // console.log("--------")
+    // console.log(data)
+    // console.log("--------")
+    // console.log(userId)
     if(workflowTitle.length>0){
         return res.status(409).json({
             message: "Workflow with the same title already exists for the user"
@@ -122,10 +127,11 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
     }
     try{    
         const workflow = await WorkflowModel.create({
-            userId,
+            userId: userId,
             title: data.title,
             nodes: data.nodes,
-            edges: data.edges
+            edges: data.edges,
+            // workflowId: data.title+"-"+userId
         })
         console.log("Workflow created successfully")
         return res.status(200).json({
@@ -133,24 +139,25 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
             id:workflow._id
         })
     }
-    catch(e){
-        console.log("Error in creating workflow")
-         return res.status(500).json({
-            message: "Internal Server Error",
-            error: e
-        })
-    }
+    catch(e:any) {
+    console.error("FULL ERROR DETAILS:", e); // <--- Add this
+    return res.status(500).json({
+        message: "Internal Server Error",
+        error: e.message // Send the message specifically
+    });
+}
 })
 
 app.put("/workflow/:workflowId", authMiddleware, async (req, res)=>{
+    const userId = req.userId!;
     const {success, data} = UpdateWorkflowSchema.safeParse(req.body);
     if(!success){
         return res.status(400).json({
             message: "Incorrect Inputs"
         })
     }
-    const workflowTitle = await WorkflowModel.find({title: data.newTitle});
-    console.log(workflowTitle)
+    const workflowTitle = await WorkflowModel.find({title: data.newTitle, userId: userId});
+    // console.log(workflowTitle)
     if(workflowTitle.length>0 && data.newTitle!=data.prevTitle){
         return res.status(409).json({
             message: "Workflow with the same title already exists for the user"

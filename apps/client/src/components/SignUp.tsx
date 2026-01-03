@@ -25,7 +25,7 @@ export default function SignUp() {
 
     try {
       const endpoint = isSignIn ? "/signin" : "/signup";
-      console.log(import.meta.env.VITE_API_URL);
+      // console.log(import.meta.env.VITE_API_URL);
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
@@ -35,7 +35,7 @@ export default function SignUp() {
       });
 
       const data = await response.json();
-      console.log(response.ok);
+      // console.log(response.ok);
       if (!response.ok) {
         setError(data.message || "An error occurred");
         setLoading(false);

@@ -50,7 +50,7 @@ export default function Dashboard() {
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setWorkflows(data);
     } catch (err) {
       setError("Failed to load workflows");
@@ -90,7 +90,10 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-8">
           {/* Profile Tab */}
           <div className="flex items-center gap-3">
-            <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white dark:bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+            <button
+              onClick={() => navigate("/platform-signup")}
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white dark:bg-card border border-border shadow-sm hover:shadow-md transition-shadow"
+            >
               <User className="w-6 h-6 text-foreground" />
             </button>
           </div>
