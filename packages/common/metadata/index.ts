@@ -13,7 +13,7 @@ export interface NodeType {
   };
   id: string;
   position: { x: number; y: number };
-  credentials: any
+  credentials?: any
 }
 
 export interface Edge {

@@ -66,9 +66,15 @@ export default function Dashboard() {
   };
 
   const handleRunWorkflow = async (workflowId: string) => {
-    // TODO: Implement workflow execution
-    console.log("Running workflow:", workflowId);
-    alert("Workflow execution feature coming soon!");
+    const response = await fetch(`${API_BASE_URL}/runWorkflow/${workflowId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: String(localStorage.getItem("token")),
+      },
+    });
+    const data = await response.json();
+    console.log(data);
   };
 
   const handleConnectCredentials = () => {

@@ -6,6 +6,7 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "./middleware";
 import { sendWelcomeEmail } from "./emailService";
+import { runWorkflow } from "./runWorkflow";
 
 const uri = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -117,12 +118,6 @@ app.post("/workflow", authMiddleware, async (req, res)=>{
     }
     const data = result.data;
     const workflowTitle = await WorkflowModel.find({title: data.title, userId : userId});
-    // console.log("--------")
-    // console.log(workflowTitle)
-    // console.log("--------")
-    // console.log(data)
-    // console.log("--------")
-    // console.log(userId)
     if(workflowTitle.length>0){
         return res.status(409).json({
             message: "Workflow with the same title already exists for the user"
@@ -222,12 +217,17 @@ app.get("/workflows", authMiddleware, async(req, res)=>{
     return res.status(200).json(workflows)
 })
 
-// app.post("/credentials", (req, res)=>{
-
-// })
-
-// app.get("/credentials", (req,res)=>{
-
-// })
+app.get("/runWorkflow/:workflowId", authMiddleware, async(req, res)=>{
+    const workflow = await WorkflowModel.findById(req.params.workflowId)
+    if(!workflow || workflow.userId.toString()!==req.userId){
+        return res.status(404).json({
+            message: "Workflow Not Found"
+        })
+    }
+    console.log(typeof workflow.userId)
+    console.log(typeof workflow.title)
+    runWorkflow(workflow.nodes, workflow.edges)
+    return res.status(200).json(workflow)
+})
 
 app.listen(process.env.PORT||3000)

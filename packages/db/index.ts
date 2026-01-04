@@ -59,15 +59,16 @@ const WorkflowNodesSchema = new Schema({
     type:{
         // type:mongoose.Types.ObjectId,
         type:String,
+        enum: ["price-trigger", "time-trigger", "hyperliquid", "backpack", "lighter"],
         required:true,
         // ref: "Nodes"
     },
-    data: NodeDataSchema,
+    data: {type: NodeDataSchema, required:true},
     id: {
         type:String,
         required:true
     },
-    position: PositionSchema,
+    position: {type: PositionSchema, required:true},
     credentials: Schema.Types.Mixed
 }, {_id:false})
 
@@ -81,11 +82,6 @@ const WorkflowSchema = new Schema({
         type:String,
         required:true,
     },
-    // workflowId:{
-    //     type:String,
-    //     required:true,
-    //     unique:true
-    // },
     nodes: [WorkflowNodesSchema],
     edges:[EdgesSchema]
 });
