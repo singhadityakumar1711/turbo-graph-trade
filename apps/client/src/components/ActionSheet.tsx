@@ -1,8 +1,4 @@
-import type {
-  NodeKind,
-  TradingMetadata,
-  TradingType,
-} from "common/types";
+import type { NodeKind, TradingMetadata, TradingType } from "common/types";
 import { SUPPORTED_ASSETS } from "common/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,15 +95,15 @@ export const ActionSheet = ({
               <SelectContent position="popper" className="border-slate-200">
                 <SelectGroup>
                   {SUPPORTED_ACTIONS.map(({ id, title }) => (
-                    <>
-                      <SelectItem
-                        value={id}
-                        key={id}
-                        className="cursor-pointer hover:bg-slate-50"
-                      >
-                        {title}
-                      </SelectItem>
-                    </>
+                    // <>
+                    <SelectItem
+                      value={id}
+                      key={id}
+                      className="cursor-pointer hover:bg-slate-50"
+                    >
+                      {title}
+                    </SelectItem>
+                    // </>
                   ))}
                 </SelectGroup>
               </SelectContent>
@@ -135,15 +131,15 @@ export const ActionSheet = ({
                   <SelectContent position="popper" className="border-slate-200">
                     <SelectGroup>
                       {SUPPORTED_ASSETS.map((pos) => (
-                        <>
-                          <SelectItem
-                            value={pos}
-                            key={pos}
-                            className="cursor-pointer hover:bg-slate-50"
-                          >
-                            {pos}
-                          </SelectItem>
-                        </>
+                        // <>
+                        <SelectItem
+                          value={pos}
+                          key={pos}
+                          className="cursor-pointer hover:bg-slate-50"
+                        >
+                          {pos}
+                        </SelectItem>
+                        // </>
                       ))}
                     </SelectGroup>
                   </SelectContent>
@@ -155,9 +151,14 @@ export const ActionSheet = ({
                 </label>
                 <Input
                   type="number"
-                  value={qty as number}
+                  // value={qty as number}
+                  value={qty ?? ""}
+                  // onChange={(e) => {
+                  //   setQty(Number(e.target.value));
+                  // }}
                   onChange={(e) => {
-                    setQty(Number(e.target.value));
+                    const val = e.target.value;
+                    setQty(val === "" ? null : Number(val));
                   }}
                   className="h-11 border-slate-300 focus:border-slate-400 focus:ring-slate-400"
                   placeholder="Enter quantity"
@@ -177,15 +178,15 @@ export const ActionSheet = ({
                   <SelectContent position="popper" className="border-slate-200">
                     <SelectGroup>
                       {SUPPORTED_TRADE.map((pos) => (
-                        <>
-                          <SelectItem
-                            value={pos}
-                            key={pos}
-                            className="cursor-pointer hover:bg-slate-50"
-                          >
-                            {pos}
-                          </SelectItem>
-                        </>
+                        // <>
+                        <SelectItem
+                          value={pos}
+                          key={pos}
+                          className="cursor-pointer hover:bg-slate-50"
+                        >
+                          {pos}
+                        </SelectItem>
+                        // </>
                       ))}
                     </SelectGroup>
                   </SelectContent>

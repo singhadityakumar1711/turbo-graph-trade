@@ -93,15 +93,15 @@ export const TriggerSheet = ({
               <SelectContent position="popper" className="border-slate-200">
                 <SelectGroup>
                   {SUPPORTED_TRIGGERS.map(({ id, title }) => (
-                    <>
-                      <SelectItem
-                        value={id}
-                        key={id}
-                        className="cursor-pointer hover:bg-slate-50"
-                      >
-                        {title}
-                      </SelectItem>
-                    </>
+                    // <>
+                    <SelectItem
+                      value={id}
+                      key={id}
+                      className="cursor-pointer hover:bg-slate-50"
+                    >
+                      {title}
+                    </SelectItem>
+                    // </>
                   ))}
                 </SelectGroup>
               </SelectContent>
@@ -149,7 +149,7 @@ export const TriggerSheet = ({
                   Asset
                 </label>
                 <Select
-                  value={(metadata as PriceTriggerNodeMetadata).asset}
+                  value={(metadata as PriceTriggerNodeMetadata).asset || ""}
                   onValueChange={(value) =>
                     setMetadata((m) => ({
                       ...m,
@@ -163,15 +163,15 @@ export const TriggerSheet = ({
                   <SelectContent position="popper" className="border-slate-200">
                     <SelectGroup>
                       {SUPPORTED_ASSETS.map((id) => (
-                        <>
-                          <SelectItem
-                            value={id}
-                            key={id}
-                            className="cursor-pointer hover:bg-slate-50"
-                          >
-                            {id}
-                          </SelectItem>
-                        </>
+                        // <>
+                        <SelectItem
+                          value={id}
+                          key={id}
+                          className="cursor-pointer hover:bg-slate-50"
+                        >
+                          {id}
+                        </SelectItem>
+                        // </>
                       ))}
                     </SelectGroup>
                   </SelectContent>
