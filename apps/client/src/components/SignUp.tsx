@@ -10,6 +10,7 @@ export default function SignUp() {
   const [isSignIn, setIsSignIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -24,15 +25,23 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const endpoint = isSignIn ? "/signin" : "/signup";
+      // const endpoint = isSignIn ? "/signin" : "/signup";
       // console.log(import.meta.env.VITE_API_URL);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = isSignIn
+        ? await fetch(`${API_BASE_URL}/signin`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          })
+        : await fetch(`${API_BASE_URL}/signup`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password, email }),
+          });
 
       const data = await response.json();
       // console.log(response.ok);
@@ -139,6 +148,22 @@ export default function SignUp() {
                 className="w-full"
               />
             </div>
+
+            {!isSignIn && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full"
+                />
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm">

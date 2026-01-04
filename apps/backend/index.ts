@@ -5,6 +5,7 @@ import {SignupSchema, SigninSchema, CreateWorkflowSchema, UpdateWorkflowSchema} 
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "./middleware";
+import { sendWelcomeEmail } from "./emailService";
 
 const uri = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -38,9 +39,11 @@ app.post("/signup", async (req, res)=>{
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const user = await UserModel.create({
             username: data.username,
-            password: hashedPassword
+            password: hashedPassword,
+            email: data.email
         })
         console.log("User created successfully");
+        sendWelcomeEmail(data.email, data.username).catch(console.error);
         return res.status(200).json({
             message: "User created successfully",
             id: user._id
